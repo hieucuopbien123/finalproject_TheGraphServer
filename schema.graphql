@@ -1,0 +1,76 @@
+type Collection @entity {
+  id: Bytes! # <collection address>
+}
+type Stat @entity {
+  id: String! # <auction type>_<collection 0/bid 1/create 2>_<entity address>
+  auctionType: Int8! # 0 1 2 3 4 5 6 7 8 9
+  entityAddress: Bytes!
+  auctionCount: Int! # Sang user sẽ thành số lần bid, không phải số auctionbid
+  statType: Int8! # 0 là colection, 1 là bid, 2 là create
+  volume: [Volume!]! 
+}
+type Volume @entity {
+  id: String! # <Stat id/auctiontpye>_<payment token>
+  paymentToken: Bytes!
+  amount: BigInt!
+}
+type AuctionCommon @entity {
+  id: String!
+  collectionCount: Int!
+  collectionList: [Collection!]!
+  creatorCount: Int!
+  creatorList: [User!]!
+  auctionCount: Int!
+  volume: [Volume!]!
+}
+type AuctionDetail @entity {
+  id: Bytes! # <auction address>
+  auctionType: Int8!
+  status: Int # 0 is ongoing, 1 is ended
+  auctionCreator: User!
+  collectionAddress: [Bytes!]!
+  nftIds: [BigInt!]!
+  nftCount: [BigInt!]!
+  trade: [Trade!]! @derivedFrom(field: "auctionDetail")
+  timestamp: BigInt!
+
+  minimumPrice: BigInt!
+  startingPrice: BigInt!
+  stepDuration: BigInt!
+  paymentToken: Bytes!
+  currentBidder: Bytes!
+  currentBid: BigInt!
+  startTime: BigInt!
+  endTime: BigInt!
+  revealBlockNum: BigInt!
+  bidStep: BigInt!
+  revealStep: BigInt!
+  sndBid: BigInt!
+}
+type Trade @entity {
+  id: String! # <user address>_<auction address>_<type>_<timestamp>
+  type: Int8! # 0 là tạo, 1 là bid, 2 là edit, 3 là end auction, 4 là reveal, 5 là start reveal
+  hash: Bytes!
+  auctioneer: User!
+  bidder: User!
+  price: BigInt!
+  auctionDetail: AuctionDetail!
+  timestamp: BigInt!
+}
+type User @entity {
+  id: Bytes! # <user address>
+  auctionOwned: [AuctionDetail!]! @derivedFrom(field: "auctionCreator")
+  auctionBidded: [AuctionDetail!]!
+  biddedCollection: [Collection!]!
+  ownedCollection: [Collection!]!
+  ownedCollectionCount: Int!
+  biddedCollectionCount: Int!
+  stats: [Stat!]!
+  trade: [Trade!]! @derivedFrom(field: "bidder")
+}
+type NFT @entity {
+  id: String! # <address>_<tokenid>
+  address: Bytes!
+  tokenId: BigInt!
+  auctionDetail: [AuctionDetail!]!
+}

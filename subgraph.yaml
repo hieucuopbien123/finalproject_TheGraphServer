@@ -1,0 +1,57 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AuctionFactory
+    network: sepolia
+    source:
+      address: "0x38B59C35b6f7e94A0bE04190Af7d744bff0a869D"
+      abi: AuctionFactory
+      startBlock: 5884850
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AuctionCommon
+        - AuctionDetail
+        - Trade
+        - User
+        - NFT
+        - Volume
+        - Stat
+        - Collection
+      abis:
+        - name: AuctionFactory
+          file: ./abis/AuctionFactory.json
+        - name: DutchAuction
+          file: ./abis/DutchAuction.json
+        - name: EnglishAuction
+          file: ./abis/EnglishAuction.json
+        - name: SealedBidAuctionV1
+          file: ./abis/SealedBidV1Auction.json
+        - name: SealedBidAuctionV2
+          file: ./abis/SealedBidV2Auction.json
+        - name: VickreyAuction
+          file: ./abis/VickreyAuction.json
+      eventHandlers:
+        - event: AuctionCreated(address,uint256)
+          handler: handleAuctionCreated
+        - event: AuctionFinalized(address,uint256)
+          handler: handleAuctionFinalized
+        - event: BidAuction(address,uint256,address,uint256)
+          handler: handleBidAuction
+        - event: Paused(address)
+          handler: handlePaused
+        - event: RevealAuction(address,uint256,address,uint256)
+          handler: handleRevealAuction
+        - event: RevealStarted(address,uint256)
+          handler: handleRevealStarted
+        - event: Unpaused(address)
+          handler: handleUnpaused
+        - event: UpdateAuction(address,uint256)
+          handler: handleUpdateAuction
+      file: ./src/auction-factory.ts
